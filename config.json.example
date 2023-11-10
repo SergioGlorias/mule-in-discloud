@@ -1,5 +1,6 @@
 {
     "discord_token": "",
     "prefix":"!",
-    "hostname": "https://example.com"
+    "hostname": "https://example.com",
+    "channels_limit": []
 }

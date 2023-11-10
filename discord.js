@@ -1,5 +1,5 @@
 const { Client, GatewayIntentBits } = require("discord.js")
-const { discord_token, prefix, hostname } = require("./config.json")
+const { discord_token, prefix, hostname, channels_limit } = require("./config.json")
 
 module.exports = async (db) => {
     const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] });
@@ -11,6 +11,7 @@ module.exports = async (db) => {
     client.on("messageCreate", async (msg) => {
         console.log(msg.content)
         if (msg.author.bot) return
+        if (!channels_limit.includes(msg.channel.id)) return
 
         let args = msg.content.split(/\s+/)
         let cmd = args.shift()
