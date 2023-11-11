@@ -21,14 +21,21 @@ async function getLCC(source, gamesParam) {
 
     if (!roundInfo) return ''
 
+    const games = []
+
+    for (let i = 1; i <= roundInfo.pairings.length; i++) {
+        if (i > gamesParam) break
+        let getGame = await fetch(
+            `https://1.pool.livechesscloud.com/get/${tournamentId}/round-${round}/game-${i}.json`
+        ).then(res => res.status !== 200 ? null : res.json());
+        games.push(getGame);
+    }
+
     let pgn = ''
 
-    for await (const [index, pairing] of roundInfo.pairings.entries()) {
-        let i = index + 1
-        if (i > gamesParam) break
-
+    for (const [boardIndex, game] of games.entries()) {
+        const pairing = roundInfo.pairings[boardIndex];
         if (!pairing.white || !pairing.black) continue;
-
         const chess = new Chess();
 
         chess.header(
@@ -44,17 +51,13 @@ async function getLCC(source, gamesParam) {
             chess.header('BlackTitle', pairing.black.title);
         }
 
-        let game = await fetch(
-            `https://1.pool.livechesscloud.com/get/${tournamentId}/round-${round}/game-${i}.json`
-        ).then(res => res.status !== 200 ? null : res.json());
-
-        let lastTime = ""
         if (game) {
+            let lastTime = ""
             for (const move of game.moves) {
                 try {
                     const [sat, timeStringInSecs] = move.split(' ');
                     chess.move(sat);
-
+    
                     if (timeStringInSecs !== undefined && !timeStringInSecs.startsWith('+')) {
                         const time = dayjs.duration(parseInt(timeStringInSecs), "seconds")
                         lastTime = `[%clk ${time.hours()}:${time.minutes()}:${time.seconds()}]`
@@ -66,9 +69,8 @@ async function getLCC(source, gamesParam) {
                 }
             }
         }
-
+        
         pgn += chess.pgn() + '\n\n';
-
     }
 
     return pgn
