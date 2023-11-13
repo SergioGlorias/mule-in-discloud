@@ -4,12 +4,11 @@ const { discord_token, prefix, hostname, channels_limit } = require("./config.js
 module.exports = async (db) => {
     const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessages] });
 
-    client.on('ready', () => {
+    client.on('ready', async () => {
         console.log(`Logged in as ${client.user.tag}!`);
     });
 
     client.on("messageCreate", async (msg) => {
-        console.log(msg.content)
         if (msg.author.bot) return
         if (!channels_limit.includes(msg.channel.id)) return
 
@@ -47,6 +46,12 @@ module.exports = async (db) => {
 
                 msg.reply(`Source removed`)
             }
+        }
+
+        if (cmd === `${prefix}list`) {
+            let list = await db.all()
+            let s = list.map(i => `\`${i.id}\` | ${i.value.type} | [#${i.value.tournamentId}](https://view.livechesscloud.com/#${i.value.tournamentId}) **R:** ${i.value.round}`).join("\n")
+            msg.reply(s)
         }
     })
 

@@ -57,7 +57,7 @@ async function getLCC(source, gamesParam) {
                 try {
                     const [sat, timeStringInSecs] = move.split(' ');
                     chess.move(sat);
-    
+
                     if (timeStringInSecs !== undefined && !timeStringInSecs.startsWith('+')) {
                         const time = dayjs.duration(parseInt(timeStringInSecs), "seconds")
                         lastTime = `[%clk ${time.hours()}:${time.minutes()}:${time.seconds()}]`
@@ -69,7 +69,7 @@ async function getLCC(source, gamesParam) {
                 }
             }
         }
-        
+
         pgn += chess.pgn() + '\n\n';
     }
 
