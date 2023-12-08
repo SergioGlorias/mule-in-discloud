@@ -41,7 +41,7 @@ module.exports = async (db) => {
                 return msg.reply("You need to provide the source name")
             }
 
-            if (await db.get(args[0])){
+            if (await db.get(args[0])) {
                 await db.delete(args[0])
 
                 msg.reply(`Source removed`)
