@@ -2,5 +2,6 @@
     "discord_token": "",
     "prefix":"!",
     "hostname": "https://example.com",
-    "channels_limit": []
+    "channels_limit": [],
+    "port": 8080
 }

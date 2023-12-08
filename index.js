@@ -38,7 +38,7 @@ if (cluster.isPrimary) {
 
     reply.send(pgn)
   })
-  fastify.listen({ port: 8080, host: "0.0.0.0" }, (err) => {
+  fastify.listen({ port: require("./config.json").port, host: "0.0.0.0" }, (err) => {
     if (err) {
       fastify.log.error(err)
       process.exit(1)
