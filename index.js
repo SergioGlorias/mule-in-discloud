@@ -1,49 +1,68 @@
 const cluster = require('node:cluster');
 const process = require('node:process');
 
-const fastify = require('fastify')({ logger: true })
-const { getLCC } = require("./lcc")
+const fastify = require('fastify')({ logger: true });
+const { getLCC } = require("./lcc");
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
-if (cluster.isPrimary) {
-  console.log(`Primary ${process.pid} is running`);
+const Redis = require("ioredis");
 
-  // Fork workers.
-  for (let i = 0; i < 2; i++) {
-    cluster.fork();
-  }
+const config = require("./config.json");
 
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`worker ${worker.process.pid} died`);
-    cluster.fork();
-  });
+(async () => {
 
-  require("./discord")(db)
-} else {
-  fastify.get('/:source', async function handler(request, reply) {
-    let gamesParam = request.query.games ?? 128;
-    let source = request.params.source
+  const redis = new Redis(config.redis)
 
-    let pgn = ''
+  if (cluster.isPrimary) {
+    console.log(`Primary ${process.pid} is running`);
 
-    if (source) {
-      let data = await db.get(source)
-      if (data) {
-        if (data.type === "LCC") {
-          pgn += await getLCC(data, gamesParam)
+    // Fork workers.
+    for (let i = 0; i < 2; i++) {
+      cluster.fork();
+    }
+
+    cluster.on('exit', (worker, code, signal) => {
+      console.log(`worker ${worker.process.pid} died`);
+      cluster.fork();
+    });
+
+    require("./discord")(db)
+  } else {
+    fastify.get('/:source', async function handler(request, reply) {
+      let gamesParam = request.query.games ?? 128;
+      let source = request.params.source
+
+      let pgn = ''
+
+      if (source) {
+        let data = await db.get(source)
+        if (data) {
+          if (data.type === "LCC") {
+            let value = await redis.get(source).then((result) => result)
+            if (value) {
+              console.log("cache")
+              reply.send(value)
+              let pgn = await getLCC(data, gamesParam)
+              await redis.set(source, pgn, "EX", 60)
+            } else {
+              console.log("no cache")
+              let pgn = await getLCC(data, gamesParam)
+              reply.send(pgn)
+              await redis.set(source, pgn, "EX", 60)
+            }
+
+          }
         }
       }
-    }
+    })
+    fastify.listen({ port: config.port, host: "0.0.0.0" }, (err) => {
+      if (err) {
+        fastify.log.error(err)
+        process.exit(1)
+      }
+    })
+    console.log(`Worker ${process.pid} started`);
+  }
 
-    reply.send(pgn)
-  })
-  fastify.listen({ port: require("./config.json").port, host: "0.0.0.0" }, (err) => {
-    if (err) {
-      fastify.log.error(err)
-      process.exit(1)
-    }
-  })
-  console.log(`Worker ${process.pid} started`);
-}
-
+})()

@@ -3,5 +3,11 @@
     "prefix":"!",
     "hostname": "https://example.com",
     "channels_limit": [],
-    "port": 8080
+    "port": 8080,
+    "redis": {
+        "port": 18387,
+        "host": "",
+        "username": "default",
+        "password": ""
+    }
 }

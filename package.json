@@ -15,6 +15,10 @@
     "dayjs": "^1.11.10",
     "discord.js": "^14.14.1",
     "fastify": "^4.24.3",
+    "ioredis": "^5.3.2",
     "quick.db": "^9.1.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.4"
   }
 }

@@ -73,6 +73,8 @@ async function getLCC(source, gamesParam) {
         pgn += chess.pgn() + '\n\n';
     }
 
+    console.log("LCC get")
+
     return pgn
 }
 
