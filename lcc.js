@@ -64,7 +64,6 @@ async function getLCC(source, gamesParam) {
                         chess.setComment(lastTime);
                     }
                 } catch {
-                    chess.setComment("No More Moves: Illegal Move")
                     break
                 }
             }
