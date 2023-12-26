@@ -35,21 +35,28 @@ async function getLCC(source, gamesParam) {
 
     for (const [boardIndex, game] of games.entries()) {
         const pairing = roundInfo.pairings[boardIndex];
-        if (!pairing.white || !pairing.black) continue;
         const chess = new Chess();
 
+        if (pairing.white) {
+            chess.header(
+                'White', getPlayerName(pairing.white)
+            );
+            if (pairing.white.title) {
+                chess.header('WhiteTitle', pairing.white.title);
+            }
+        }
+        if (pairing.black) {
+            chess.header(
+                'Black', getPlayerName(pairing.black)
+            );
+            if (pairing.black.title) {
+                chess.header('BlackTitle', pairing.black.title);
+            }
+        }
+
         chess.header(
-            'White', getPlayerName(pairing.white),
-            'Black', getPlayerName(pairing.black),
             'Result', pairing.result
         );
-
-        if (pairing.white.title) {
-            chess.header('WhiteTitle', pairing.white.title);
-        }
-        if (pairing.black.title) {
-            chess.header('BlackTitle', pairing.black.title);
-        }
 
         if (game) {
             let lastTime = ""
