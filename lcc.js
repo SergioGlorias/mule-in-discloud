@@ -45,7 +45,7 @@ async function getLCC(source, gamesParam) {
                 chess.header('WhiteTitle', pairing.white.title);
             }
             if (pairing.white.fideid) {
-                chess.header('WhiteFideId', pairing.white.fideid);
+                chess.header('WhiteFideId', pairing.white.fideid.toString());
             }
         }
         if (pairing.black) {
@@ -56,7 +56,7 @@ async function getLCC(source, gamesParam) {
                 chess.header('BlackTitle', pairing.black.title);
             }
             if (pairing.black.fideid) {
-                chess.header('BlackFideId', pairing.black.fideid);
+                chess.header('BlackFideId', pairing.black.fideid.toString());
             }
         }
 
